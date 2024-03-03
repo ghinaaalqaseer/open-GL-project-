@@ -1,0 +1,4553 @@
+#include <GL/glut.h>
+#include <math.h>
+
+//to use playSound function
+#include<mmsystem.h>
+
+double th = 0;
+double Ex = -10;//0//13;
+double Ez = 0;//0//45;
+double Ey = 2;//6//0
+double x = 0;
+double r = 0;
+double q = 0;
+double b = 0;
+bool g = false;
+double h = 0;
+double l;
+bool t = false;
+double e = 0;
+
+
+GLUquadricObj* a = gluNewQuadric();
+
+void keyboard(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case VK_ESCAPE: /* Escape key */
+		exit(0);
+		break;
+	case'l':
+		l++;
+		break;
+	case '5':
+		Ey += 0.5;
+		break;
+	case '2':
+		Ey -= 0.5;
+		break;
+	case '`':
+		glEnable(GL_LIGHTING);
+		break;
+	case'1':
+		glDisable(GL_LIGHTING);
+		break;
+	case 'x':
+		::r -= 0.1;
+		break;
+	case'z':
+		::r += 0.1;
+		break;
+	case 'v':
+		::q -= 0.1;
+		break;
+	case'c':
+		::q += 0.1;
+		break;
+	case'b':
+		::b += 1;
+		break;
+	case 'm':
+		::g = true;
+		break;
+	case 'n':
+		::g = false;
+		break;
+	case 'p':
+		::t = true;
+		break;
+	case 'o':
+		::t = false;
+		break;
+	default:
+		break;
+	}
+}
+
+void Special(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_RIGHT:
+		th += 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		th -= 0.1;
+		break;
+	case GLUT_KEY_UP:
+		Ex = Ex + 2 * cos(th);
+		Ez = Ez + 2 * sin(th);
+		break;
+	case GLUT_KEY_DOWN:
+		Ex = Ex - 2 * cos(th);
+		Ez = Ez - 2 * sin(th);
+		break;
+	default:
+		break;
+	}
+}
+
+void Mouse(int b, int s, int x, int y)
+{
+	if (b == GLUT_LEFT_BUTTON && s == GLUT_DOWN)
+	{
+		th += 0.1;
+	}
+	else
+		th -= 0.1;
+}
+
+void InitGL(void)
+{
+	glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
+	glClearColor(0.6f, 0.5f, 1.0f, 0.5f);				// Black Background
+	glClearDepth(1.0f);									// Depth Buffer Setup
+	glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+	glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+	glEnable(GL_COLOR_MATERIAL);
+	float di[] = { 1, 1, 1, 0 };
+	float am[] = { 0.7, 0.7, 0.7, 0 };
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, di);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, am);
+
+	//to add background music, it only plays wav files
+	//add the sound file to your project's folder
+	//PlaySound("S.wav", 0, SND_ASYNC | SND_LOOP);
+
+	//تعريف الليست بيكون بتابع التهئية دوماً مو بتابع الرسم
+	//أثناء الرسم داخل الليست منفكر بس بالتحويلات الهندسية الخاصة بتوضع العناصر بالنسبة لبعضن لحتى الشكل المطلوب
+	//ما منحط التحويلات الهندسية الخاصة بتوضع الشكل ضمن البيئة هون منحطن قبل الاستدعاء بتابع الرسم
+	//a display list should start with PushMatrix and end with PopMatrix to cancel the transformations inside
+	// //////////////////////
+	//الدردج
+	glNewList(50, GL_COMPILE);
+	glPushMatrix();
+	glTranslatef(0, -6, 0);
+	glScalef(0.33, 0.06, 0.7);
+	glutSolidCube(1);
+	glPopMatrix();
+	glEndList();
+	// ////////////////////////////////////////////////////////////////////////////////////// write here 
+	glNewList(40, GL_COMPILE);
+	glPushMatrix();
+	//الرجلين
+	glPushMatrix();
+	glTranslatef(23.3, 0, -0.2);
+	glRotatef(90, 1, 0.1, 0.1);
+	glColor3ub(162, 163, 164);
+	gluCylinder(a, 0.1, 0.1, 2, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(22, -0.02, -0.2);
+	glRotatef(90, 0, 1, 0);
+	glScalef(1, 1, 1.5);
+	glColor3ub(162, 163, 164);
+	gluCylinder(a, 0.1, 0.1, 0.9, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(22.1, -0.01, -0.2);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1, 1, 1.5);
+	glColor3ub(162, 163, 164);
+	gluCylinder(a, 0.1, 0.1, 0.4, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(22.1, -0.6, -0.2);
+	glRotatef(90, 1, -0.1, -0.2);
+	glColor3ub(162, 163, 164);
+	gluCylinder(a, 0.1, 0.1, 1.3, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+
+	glNewList(41, GL_COMPILE);
+	glPushMatrix();
+	// الاعدة
+	glPushMatrix();
+	glColor3ub(242, 194, 98);
+	glTranslatef(22.8, -0.6, -1);
+	glRotatef(90, 0, 1, 0);
+	glScalef(1.4, 0.07, 1.5);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//عصايات السنادة 
+	glPushMatrix();
+	glTranslatef(23.7, 0.5, -0.5);
+	glRotatef(90, 1, -0.1, 0);
+	glColor3ub(162, 163, 164);
+	gluCylinder(a, 0.05, 0.05, 1.1, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(23.7, 0.5, -1.4);
+	glRotatef(90, 1, -0.1, 0);
+	glColor3ub(162, 163, 164);
+	gluCylinder(a, 0.05, 0.05, 1.1, 50, 50);
+	glPopMatrix();
+
+	//السنادة  
+	glPushMatrix();
+	glColor3ub(242, 194, 98);
+	glTranslatef(23.63, 0.3, -1);
+	glRotatef(180, 1, -0.05, 0);
+	glScalef(0.03, 1, 1.3);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+
+	glEndList();
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	glNewList(29, GL_COMPILE);
+	glPushMatrix();
+	glPushMatrix();
+	glTranslatef(1, 0, 0);
+	glColor3f(0.8, 0.7, 0.5);
+	glScalef(0.0001, 0.23, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.1, 0, 0);
+	glColor3f(0.2, 0.3, 0.5);
+	glScalef(0.1, 0.27, 0.13);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.99, -0.083, 0);
+	glColor3f(0.2, 0.3, 0.5);
+	glScalef(0.1, 0.03, 0.2);
+	glutSolidCube(0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.99, -0.09, 0);
+	glColor3f(0.2, 0.3, 0.5);
+	glScalef(0.1, 0.03, 0.2);
+	glutSolidCube(0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.99, -0.02, -0.025);
+	glScalef(0.0001, 0.4, 0.2);
+	glColor3f(0.2, 0.3, 0.5);
+	glutSolidCube(0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.99, 0, -0.025);
+	glScalef(0.0001, 0.1, 0.2);
+	glColor3f(0.2, 0.1, 0.1);
+	glutSolidCube(0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.99, -0.02, -0.025);
+	glColor3f(0.2, 0.1, 0.1);
+	glScalef(0.09, 0.09, 0.09);
+	glutSolidSphere(0.1, 70, 70);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	////////////////////////
+	glNewList(28, GL_COMPILE);
+	//table
+	glPushMatrix();
+	glPushMatrix();
+	glTranslatef(0, -0.03, 0);
+	glPushMatrix();
+	glTranslatef(1, -0.0035, 0);
+	glColor3f(0.3, 0.5, 0.2);
+	glScalef(0.2, 0.015, 0.2);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1, -0.11, 0);
+	glColor3f(0.3, 0.3, 0.1);
+	glRotatef(180, 0, 1, 1);
+	gluCylinder(a, 0.02, 0.02, 0.1, 35, 35);
+	glPopMatrix();
+
+
+	glPushMatrix();
+	glColor3f(0.3, 0.5, 0.7);
+	glTranslatef(1, -0.11, 0);
+	glScalef(0.07, 0.01, 0.07);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+
+	//	//chaire يلي مقابيلي
+	glPushMatrix();
+	glTranslatef(2, -0.01, 0);
+	glRotatef(180, 0, 1, 0);
+	glPushMatrix();
+	glTranslatef(0.845, 0, 0);
+	glColor3f(0.2, 0.6, 0.4);
+	glScalef(0.001, 0.06, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.885, -0.055, 0);
+	glColor3f(0.09, 0.2, 0.4);
+	glScalef(0.08, 0.01, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, 0.043);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.012, 0.012, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, -0.042);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, -0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, 0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+
+	//الكرسي يلي بوجهي
+
+	glTranslatef(2, -0.01, 0);
+
+	glRotatef(180, 0, 1, 0);
+	glPushMatrix();
+	glTranslatef(0.845, 0, 0);
+	glColor3f(0.2, 0.6, 0.4);
+	glScalef(0.001, 0.06, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.885, -0.055, 0);
+	glColor3f(0.09, 0.2, 0.4);
+	glScalef(0.08, 0.01, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, 0.043);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.012, 0.012, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, -0.042);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, -0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, 0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+
+	//الكرسي يلي عاليمين
+
+	glTranslatef(1, -0.01, 1);
+
+	glRotatef(90, 0, 1, 0);
+	glPushMatrix();
+	glTranslatef(0.845, 0, 0);
+	glColor3f(0.2, 0.6, 0.4);
+	glScalef(0.001, 0.06, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.885, -0.055, 0);
+	glColor3f(0.09, 0.2, 0.4);
+	glScalef(0.08, 0.01, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, 0.043);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.012, 0.012, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, -0.042);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, -0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, 0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+	//الكرسي يلي عاليسار
+
+	glTranslatef(2, -0, 0);
+	glRotatef(180, 0, 1, 0);
+	glPushMatrix();
+	glTranslatef(0.845, 0, 0);
+	glColor3f(0.2, 0.6, 0.4);
+	glScalef(0.001, 0.06, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.885, -0.055, 0);
+	glColor3f(0.09, 0.2, 0.4);
+	glScalef(0.08, 0.01, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, 0.043);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.012, 0.012, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.84, -0.12, -0.042);
+	glColor3f(0.25, 0.2, 0.3);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.4, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, -0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.92, -0.12, 0.045);
+	glColor3f(0.1, 0.3, 0.8);
+	glRotatef(180, 0, 1, 1);
+	glScalef(0.3, 0.4, 0.4);
+	gluCylinder(a, 0.013, 0.013, 0.16, 35, 35);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+
+	glNewList(24, GL_COMPILE);
+	glPushMatrix();
+	glRotated(90, 1, 0, 0);
+	gluCylinder(a, 0.5, 1, 5, 30, 30);
+	glPopMatrix();
+	glEndList();
+
+	glNewList(25, GL_COMPILE);
+	glPushMatrix();
+	glRotated(90, 0, 0, 1);
+	gluCylinder(a, 0.15, 0.15, 2, 30, 30);
+	glPopMatrix();
+	glEndList();
+
+	//
+
+	/// profesors table and chair 
+	glNewList(21, GL_COMPILE);
+	glPushMatrix();
+	glPushMatrix();
+	glCallList(19);
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(180, 0, 1, 0);
+	glTranslatef(-60.5, 6.5, -2);
+	// الكرسي 
+	glPushMatrix();
+	glTranslatef(25, -13, -1);
+	glRotatef(90, 0, 0, 1);
+	for (int i = 0; i < 360; i += 72)
+	{
+		glPushMatrix();
+		glRotatef(i, 1, 0, 0);
+
+		glCallList(20);
+		glPopMatrix();
+	}
+	glPopMatrix();
+	//عنق الكرسي
+	glPushMatrix();
+	glColor3f(0, 1, 0);
+	glTranslatef(25, -9, -1);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1, 1, 2);
+	gluCylinder(a, 0.3, 0.3, 2, 30, 30);
+	glPopMatrix();
+
+	//قاعدة الكرسي
+	glPushMatrix();
+	glColor3f(0, 1, 1);
+	glTranslatef(25, -9, -1);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1.5, 1.2, 1);
+	glutSolidTorus(1, 1, 50, 50);
+	glPopMatrix();
+
+	//عنق السنادة 
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(22.1, -7.1, -1.01);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1, 4, 1);
+	gluCylinder(a, 0.20, 0.20, 2, 30, 30);
+	glPopMatrix();
+
+	//السنادة
+	glPushMatrix();
+	glColor3f(0, 1, 0);
+	glTranslatef(22.7, -5.8, -1);
+	glRotatef(270, 0, 1, 0);
+	glScalef(1.2, 1.2, 0.6);
+	glutSolidTorus(1, 1, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	/////////////////////////////////////////////////////////
+	glNewList(19, GL_COMPILE);
+	//الجانب الايمن 
+	glPushMatrix();
+	glPushMatrix();
+	glColor3f(0, 0, 1);
+	glTranslatef(32, -3, 8);
+	glRotatef(90, 1, 0, 0);
+	glScaled(8, 0.4, 6);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//الجانب الايسر 
+	glPushMatrix();
+	glColor3f(0, 0, 1);
+	glTranslatef(32, -3, -3.5);
+	glRotatef(90, 1, 0, 0);
+	glScaled(8, 0.4, 6);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//الامامي
+	glPushMatrix();
+	glColor3f(0.5, 0.7, 0);
+	glTranslatef(28, -2.7, 2.2);
+	glScalef(0.4, 5.3, 11.5);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//الفوقاني 
+	glPushMatrix();
+	glColor3f(0.5, 0.7, 0.9);
+	glTranslatef(32, 0.2, 2);
+	glScaled(10, 0.5, 13.5);
+	glRotatef(0, 0, 1, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	//ارجل الكرسي
+	glNewList(20, GL_COMPILE);
+	glPushMatrix();
+	glRotated(90, 0, 0, 1);
+	gluCylinder(a, 0.15, 0.15, 2, 30, 30);
+	glPopMatrix();
+	glEndList();
+	//////////////////////////////////////////////////////
+	glNewList(16, GL_COMPILE);
+	glPushMatrix();
+	glRotated(90, 1, 0, 0);
+	gluCylinder(a, 0.5, 1, 5, 30, 30);
+	glPopMatrix();
+	glEndList();
+
+	glNewList(17, GL_COMPILE);
+	glPushMatrix();
+	glRotated(90, 0, 0, 1);
+	gluCylinder(a, 0.15, 0.15, 2, 30, 30);
+	glPopMatrix();
+	glEndList();
+
+	//////////////////////////////////////////////////////////////////////////////////
+	glNewList(15, GL_COMPILE);
+	glPushMatrix();
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 5; i++) {
+			glPushMatrix();
+			glRotatef(-90, 0, 1, 0);
+			glTranslatef(9.9, -5.7, -9.25);
+			glScalef(0.3, 0.4, 0.25);
+			glCallList(14);
+			glPopMatrix();
+			glTranslatef(0, 0, -1.7);
+		}
+		glPopMatrix();
+		glTranslatef(-8, 0, 0);
+	}
+	glPopMatrix();
+
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 5; i++) {
+			glPushMatrix();
+			glRotatef(-90, 0, 1, 0);
+			glTranslatef(9.9, -5.7, -5.5);
+			glScalef(0.3, 0.4, 0.25);
+			glCallList(14);
+			glPopMatrix();
+			glTranslatef(0, 0, -1.7);
+		}
+		glPopMatrix();
+		glTranslatef(-1.5, 0, 0);
+	}
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	///////////////////////////////////////////////////////////////////////////////////
+	glNewList(14, GL_COMPILE);
+	glPushMatrix();
+	glPushMatrix();
+	glCallList(12);
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(0, 0, -3);
+	glCallList(12);
+	glPopMatrix();
+
+	//الطاولة
+	glPushMatrix();
+	glCallList(13);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, 0, -5.5);
+	glCallList(13);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(1, 1, 0);
+	glTranslatef(21, 0.8, -0.6);
+	glScalef(4, 0.2, 6.5);
+	glRotatef(90, 1, 0, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	// بين رجلتين الطاولة 
+	glPushMatrix();
+	glColor3f(0, 1, 0);
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(0.75, -1.7, 21);
+	glScalef(5.48, 0.1, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	////////////////////////////////////////////////////////////////////////////////////
+	glNewList(13, GL_COMPILE);
+	glPushMatrix();
+	//رجلين الطاولة 
+	glPushMatrix();
+	glColor3f(1, 0, 0);
+	glTranslatef(21, -1.7, 2);
+	glScalef(3.5, 0.1, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(1, 0, 0);
+	glRotatef(90, 0, 0, 1);
+	glTranslatef(-0.5, -21.5, 2);
+	glScalef(2.5, 0.1, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(1, 0, 0);
+	glRotatef(90, 0, 0, 1);
+	glTranslatef(-0.5, -20.5, 2);
+	glScalef(2.5, 0.1, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glRotatef(90, 0, 0, 1);
+	glTranslatef(-1.8, -19.3, 2);
+	glScalef(0.2, 0.1, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glRotatef(90, 0, 0, 1);
+	glTranslatef(-1.8, -22.7, 2);
+	glScalef(0.2, 0.1, 0.1);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPopMatrix();
+	glEndList();
+	/////////////////////////////////////////////////////////////////////////////////////
+	glNewList(12, GL_COMPILE);
+	glPushMatrix();
+
+	// الجانب الاول 
+	glPushMatrix();
+	glTranslatef(22.1, 0, 1.8);
+	glRotatef(90, 1, -0.1, -0.2);
+	glColor3f(1, 0, 0);
+	gluCylinder(a, 0.1, 0.1, 2.2, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(22, -0.02, 1.8);
+	glRotatef(90, 0, 1, 0);
+	glScalef(1, 1, 1.5);
+	glColor3f(0, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 0.9, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(23.3, 0, 1.8);
+	glRotatef(90, 1, 0.1, 0.1);
+	glColor3f(1, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 2.2, 50, 50);
+	glPopMatrix();
+
+	//الجانب التاني 
+	glPushMatrix();
+	glTranslatef(22.1, 0, -0.2);
+	glRotatef(90, 1, -0.1, -0.2);
+	glColor3f(1, 0, 0);
+	gluCylinder(a, 0.1, 0.1, 2.2, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(22, -0.02, -0.2);
+	glRotatef(90, 0, 1, 0);
+	glScalef(1, 1, 1.5);
+	glColor3f(0, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 0.9, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(23.3, 0, -0.2);
+	glRotatef(90, 1, 0.1, 0.1);
+	glColor3f(1, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 2.2, 50, 50);
+	glPopMatrix();
+
+
+	// الاعدة 
+	glPushMatrix();
+	glColor3f(0, 1, 0);
+	glTranslatef(22.5, -0.06, 0.8);
+	glRotatef(90, 0, 0, 1);
+	glScalef(0.2, 1.5, 2);
+	glutSolidCube(1);
+	glPopMatrix();
+
+
+	// عصايات السنادة
+
+	glPushMatrix();
+	glTranslatef(23.3, -0.02, -0.2);
+	glRotatef(90, 0, 1, 0.2);
+	glColor3f(0, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 0.3, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(23.3, -0.02, 1.8);
+	glRotatef(90, 0, 1, 0.2);
+	glColor3f(0, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 0.3, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(23.9, 1.5, -0.2);
+	glRotatef(90, 1, -0.2, 0);
+	glColor3f(1, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 1.5, 50, 50);
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(23.9, 1.5, 1.8);
+	glRotatef(90, 1, -0.2, 0);
+	glColor3f(1, 0, 1);
+	gluCylinder(a, 0.1, 0.1, 1.5, 50, 50);
+	glPopMatrix();
+
+
+	// السنادة
+
+	glPushMatrix();
+	glColor3f(0, 1, 0);
+	glTranslatef(23.79, 1.5, 0.8);
+	glRotatef(180, 1, -0.1, 0);
+	glScalef(0.08, 1.5, 2.5);
+	glutSolidCube(1);
+	glPopMatrix();
+	// رقم 
+	glPushMatrix();
+	glColor3f(0, 0, 1);
+	glTranslatef(23.8, 1.8, 0.8);
+	glRotatef(180, 1, -0.1, 0);
+	glScalef(0.1, 0.5, 0.8);
+	glutSolidCube(1);
+	glPopMatrix();
+
+
+	glPopMatrix();
+	glEndList();
+	/////////////////////////////////////////////////////////////////////////////////////
+	// الشبابيك يلي مقابيل القاعات 
+	glNewList(10, GL_COMPILE);
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(5.5, 0.9, -7.2);
+	glScalef(1, 1.3, 0.05);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(4.5, 0.9, -7.18);
+	glScalef(0.1, 1.3, 0.12);
+	glutSolidCube(2);
+	glPopMatrix();
+	glEndList();
+	// /////////////////////////////////////////////////////////////////////////////////
+	//الشبابيك يلي مقابيل المدخل 
+	glNewList(4, GL_COMPILE);
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(3.55, 0.9, -9);
+	glScalef(0.05, 1.3, 1);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(3.55, 0.9, -8.054);
+	glScalef(0.1, 1.3, 0.12);
+	glutSolidCube(2);
+	glPopMatrix();
+	glEndList();
+	///////////////////////////////////////////////////////////////////////////////////////
+	glNewList(9, GL_COMPILE);
+	// الشبابيك يلي مقابيل المدخل 
+	glPushMatrix();
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(-3.4, 0.8, 22.3);
+	glPushMatrix();
+	//right side of the window 
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0, 0.4, 8);
+	glScalef(0.1, 2, 0.08);
+	glutSolidCube(2);
+	glPopMatrix();
+	// down side of the window '
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.62, -0.38, 8);
+	glScalef(0.69, 0.05, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.62, -1.6, 8);
+	glScalef(0.69, 0.05, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.62, 1.6, 8);
+	glScalef(0.69, 0.05, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.62, 2.45, 8);
+	glScalef(0.73, 0.07, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	//window glass
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(0.6, 0.4, 8.05);
+	glScalef(0.73, 2, 0.002);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	/////////////////////////////////////////////////////////////////////////////////////////
+	//عضاضة الطابقين 
+	glNewList(6, GL_COMPILE);
+	glPushMatrix();
+	glTranslatef(-4, 10, 10);
+	glRotatef(90, 1, 0, 0);
+	glColor3ub(247, 232, 232);
+	gluCylinder(a, 0.5, 0.5, 12, 50, 50);
+	glPopMatrix();
+	glEndList();
+	///////////////////////////////////////////////////////////////////////////////////
+	//all the door 
+	glNewList(8, GL_COMPILE);
+	glPushMatrix();
+	//the hand of the door
+	glPushMatrix();
+	//outer side 
+	glPushMatrix();
+	glTranslatef(-3.4, -0.2, -0.005);
+	glScalef(0.1, 0.1, 0.001);
+	glColor3ub(141, 136, 132);
+	glutSolidCube(2.8);
+	glPopMatrix();
+	//inner side 
+	glPushMatrix();
+	glTranslatef(-3.4, -0.2, 0.2);
+	glScalef(0.1, 0.1, 0.001);
+	glColor3ub(141, 136, 132);
+	glutSolidCube(2.8);
+	glPopMatrix();
+	glPopMatrix();
+	//the door
+	glPushMatrix();
+	glTranslatef(-3.9, -0.35, 0.1);
+	glColor3ub(233, 162, 91);
+	glScalef(0.90, 1.715, 0.10);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	///////////////////////////////////////////////////////////////////////////////////
+	//room 17 
+	glNewList(7, GL_COMPILE);
+	glEnable(GL_LIGHT0);
+	//left wall
+	glPushMatrix();
+	//the wall front the door
+	glPushMatrix();
+	glTranslatef(5.33, 0.02, 0);
+	glColor3ub(247, 232, 232);
+	glScalef(0.6349, 2.09, 0.20);
+	glutSolidCube(2);
+	glPopMatrix();
+	//the wall up the door
+	glPushMatrix();
+	glTranslatef(3.9, 1.74, 0);
+	glColor3ub(247, 232, 232);
+	glScalef(0.90, 0.365, 0.20);
+	glutSolidCube(2);
+	glPopMatrix();
+	//the wall behind the door
+	glPushMatrix();
+	glTranslatef(-1.5, 0.02, 0);
+	glColor3ub(247, 232, 232);
+	glScalef(4.50, 2.09, 0.20);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+
+	//right wall
+	glPushMatrix();
+	//the window
+	glPushMatrix();
+	glTranslatef(-5.9, 0, 0);
+	for (int i = 0; i < 9; i++) {
+		glCallList(1);
+		glTranslatef(1.2, 0, 0);
+	}
+	glPopMatrix();
+
+	//the upper side 
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glTranslatef(0, 1.9, 8);
+	glScalef(6, 0.28, 0.25);
+	glutSolidCube(2);
+	glPopMatrix();
+	//under the window side
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glTranslatef(0, -1.2, 8);
+	glScalef(6, 0.82, 0.25);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	//back wall
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(-3.99, 0.05, 5.97);
+	glScalef(4.20, 2.09, 0.01);
+	glutSolidCube(2);
+	glPopMatrix();
+	//front wall
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(-4, 0.01, -6);
+	glScalef(4, 2.09, 0.01);
+	glutSolidCube(2);
+	glPopMatrix();
+	//calling the door 
+	glPushMatrix();
+	glTranslatef(7.8, 0, 0);
+	glCallList(8);
+	glPopMatrix();
+	glPopMatrix();
+	glDisable(GL_LIGHT0);
+	glEndList();
+	//////////////////////////////////////////////////////////////////////////////
+	// window 
+	glNewList(31, GL_COMPILE);
+	glPushMatrix();
+	//
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0, 0.65, 8);
+	glScalef(0.1, 1.08, 0.06);
+	glutSolidCube(2);
+	glPopMatrix();
+	//
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.7, -0.34, 8);
+	glScalef(0.6, 0.05, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	//window glass
+	glPushMatrix();
+	glTranslatef(0.67, 0.65, 8.05);
+	glScalef(0.6, 1.09, 0.002);
+	glColor3ub(191, 223, 255);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+
+	///////////////////////////////////////////////////////////////////////////
+	//window with jlale 
+	glNewList(1, GL_COMPILE);
+	glPushMatrix();
+	//
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0, 0.65, 8);
+	glScalef(0.1, 1.08, 0.06);
+	glutSolidCube(2);
+	glPopMatrix();
+	//
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.7, -0.34, 8);
+	glScalef(0.6, 0.05, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	//window glass
+	glPushMatrix();
+	glTranslatef(0.67, 0.65, 8.05);
+	glScalef(0.6, 1.09, 0.002);
+	glColor3ub(191, 223, 255);
+	glutSolidCube(2);
+	glPopMatrix();
+	// اسطوانة قماش الجلالة 
+	glPushMatrix();
+	glColor3ub(0, 0, 255);
+	glTranslatef(0.11, 1.5, 7.9);
+	glRotatef(90, 0, 1, 0);
+	gluCylinder(a, 0.06, 0.06, 0.95, 50, 50);
+	glPopMatrix();
+	// اسطوانة 
+	glPushMatrix();
+	glColor3ub(255, 255, 255);
+	glTranslatef(0.11, 1.5, 7.9);
+	glRotatef(90, 0, 1, 0);
+	gluCylinder(a, 0.03, 0.03, 0.21, 50, 50);
+	glPopMatrix();
+	// الجلالة 
+	glPushMatrix();
+	glColor3ub(0, 0, 255);
+	glTranslatef(0.59, 0.7, 7.9);
+	glScalef(0.95, 1.5, 0.01);
+	glutSolidCube(1);
+	glPopMatrix();
+	// حبلة الجلالة 
+	glPushMatrix();
+	glColor3ub(255, 255, 255);
+	glTranslatef(0.098, 0.78, 7.9);
+	glScalef(0.01, 1.5, 0.01);
+	glutSolidCube(1);
+	glPopMatrix();
+	// مسكة الجلالة 
+	glPushMatrix();
+	glColor3ub(255, 255, 255);
+	glTranslatef(0.098, 0.05, 7.9);
+	glScalef(0.04, 0.3, 0.01);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();
+	//////////////////////////////////////////////////////////////////////////
+	//right room 
+	glNewList(2, GL_COMPILE);
+	glEnable(GL_LIGHT0);
+	//left wall
+	glPushMatrix();
+	//the wall front the door
+	glPushMatrix();
+	glTranslatef(-5.37, 0.02, 0);
+	glColor3ub(247, 232, 232);
+	glScalef(0.6349, 2.09, 0.20);
+	glutSolidCube(2);
+	glPopMatrix();
+	//the wall up the door
+	glPushMatrix();
+	glTranslatef(-3.9, 1.74, 0);
+	glColor3ub(247, 232, 232);
+	glScalef(0.90, 0.365, 0.20);
+	glutSolidCube(2);
+	glPopMatrix();
+	//the wall behind the door
+	glPushMatrix();
+	glTranslatef(2.5, 0.02, 0);
+	glColor3ub(247, 232, 232);
+	glScalef(5.5, 2.09, 0.20);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	//right wall
+	glPushMatrix();
+	//the window
+	glPushMatrix();
+	glTranslatef(-5.9, 0, 0);
+	for (int i = 0; i < 11; i++) {
+		glCallList(1);
+		glTranslatef(1.2, 0, 0);
+	}
+	//additional window 
+	glTranslatef(-0.1, 0, 0);
+	glScalef(0.6, 1, 1);
+	glPushMatrix();
+	//
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0, 0.65, 8);
+	glScalef(0.1, 1.08, 0.06);
+	glutSolidCube(2);
+	glPopMatrix();
+	//
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(0.7, -0.34, 8);
+	glScalef(0.6, 0.05, 0.035);
+	glutSolidCube(2);
+	glPopMatrix();
+	//window glass
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(0.7, 0.65, 8.05);
+	glScalef(0.6, 1.09, 0.003);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+
+	glPopMatrix();
+	//the upper side 
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glTranslatef(1.005, 1.9, 8);
+	glScalef(7.01, 0.28, 0.25);
+	glutSolidCube(2);
+	glPopMatrix();
+	//under the window side
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glTranslatef(1.005, -1.2, 8);
+	glScalef(7.01, 0.82, 0.25);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+
+	//back wall
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(-4, 0.05, 8);
+	glScalef(4.20, 2.09, 0.01);
+	glutSolidCube(2);
+	glPopMatrix();
+	//front wall
+	glPushMatrix();
+	glColor3ub(247, 232, 232);
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(-4, 0.01, -6);
+	glScalef(4, 2.09, 0.01);
+	glutSolidCube(2);
+	glPopMatrix();
+	//calling  the door 
+	glPushMatrix();
+	glCallList(8);
+	glPopMatrix();
+	glDisable(GL_LIGHT0);
+	glEndList();
+	// ///////////////////////////////////////////////////////////////////////////////////
+	/*glNewList(3, GL_COMPILE);
+	glScalef(0.09,0.13,0.09);
+	glPushMatrix();
+	//قاعدة الكومبيوتر
+	glPushMatrix();
+	glColor3f(0.5, 0.7, 0.9);
+	glTranslatef(32, -3, 0);
+	glScaled(10, 0.5, 16);
+	glRotatef(0, 0, 1, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	// الجانب الايمن
+	glPushMatrix();
+	glColor3f(0.5, 0.7, 0);
+	glTranslatef(32, -3, 8);
+	glRotatef(90, 1, 0, 0);
+	glScaled(12, 0.2, 19);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//الجانب الايسر
+	glPushMatrix();
+	glColor3f(0.5, 0.7, 0);
+	glTranslatef(32, -3, -8);
+	glRotatef(90, 1, 0, 0);
+	glScaled(12, 0.2, 19);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+	glEndList();*/
+	/*//whitefloor
+	//glNewList(4, GL_COMPILE);
+	//
+	//glColor3f(0.1,0.1,0.1);
+	////glScaled(8,1 , 8);
+	//glutSolidCube(0.01);
+	//
+	//glEndList();
+	*/
+	//  //////////////////////////////////////////////////////////////////
+	//the floor 
+	glNewList(5, GL_COMPILE);
+	glPushMatrix();
+	glPushMatrix();
+	glTranslatef(0, -1.45, 0);
+	glScalef(100, 0.01, 100);
+	glColor3ub(162, 163, 164);
+	glutSolidCube(100);
+	glPopMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 240; i++) {
+			glPushMatrix();
+			glTranslatef(0, -0.9, 0);
+			glScalef(10000, 0.005, 0.009);
+			glColor3ub(0, 0, 0);
+			glutSolidCube(1);
+			glPopMatrix();
+			glTranslatef(0, 0, 0.6);
+		}
+		glPopMatrix();
+		glPushMatrix();
+		for (int i = 0; i < 150; i++) {
+			glPushMatrix();
+			glTranslatef(0, -0.9, 0);
+			glScalef(10000, 0.005, 0.009);
+			glColor3ub(0, 0, 0);
+			glutSolidCube(1);
+			glPopMatrix();
+			glTranslatef(0, 0, -0.6);
+		}
+		glPopMatrix();
+		glRotatef(90, 0, 1, 0);
+	}
+	glPopMatrix();
+	glEndList();
+	// /////////////////////////////////////////////////////////////////////////////////
+}
+void ReSizeGLScene(int w, int h)
+{
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, (GLfloat)w / (GLfloat)h, 0.1f, 10000.0f);
+	//gluOrtho2D(0, 100, 0, 100);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+void DrawGLScene(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	float po[] = { 0, 0, 1, 0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, po);
+	gluLookAt(Ex, Ey, Ez, Ex + cos(th), Ey, Ez + sin(th), 0, 1, 0);
+	for (int i = 0; i < 2; i++) {
+		//glPushMatrix();
+		glCallList(5);
+		//rooms 12-10-8-6
+		glPushMatrix();
+		glTranslatef(11, 1.2, 9.5);
+		glScalef(1.4, 1, 1);
+		glRotatef(-90, 0, 1, 0);
+		for (int i = 0; i < 4; i++) {
+			glCallList(2);
+			glTranslatef(14.001, 0, 0);
+		}
+		glPopMatrix();
+
+		//rooms 11-9-7-5
+		glPushMatrix();
+		glTranslatef(19, 1.2, 11.5);
+		glScalef(1.6, 1, 1);
+		glRotatef(90, 0, 1, 0);
+		for (int i = 0; i < 4; i++) {
+			glCallList(2);
+			glTranslatef(-14.001, 0, 0);
+		}
+		glPopMatrix();
+		// الشبابيك يلي مقابيل المدخل
+		for (int i = 0; i < 3; i++) {
+			glCallList(9);
+			glTranslatef(0, 0, -1.3);
+		}
+		// الحديد يلي بعد الشبابيك
+		glPushMatrix();
+		glColor3ub(162, 163, 164);
+		glTranslatef(30.35, 1.23, 3.4);
+		glScalef(0.1, 2.09, 0.08);
+		glutSolidCube(2);
+		glPopMatrix();
+		//الحيط و الباب يلي بعد الشبابيك 
+		glRotatef(-90, 0, 1, 0);
+		glTranslatef(-2, 1.2, -30.5);
+		glPushMatrix();
+		//the wall front the door
+		glPushMatrix();
+		glTranslatef(-2.9, 0.02, 0);
+		glColor3ub(247, 232, 232);
+		glScalef(0.40, 2.09, 0.20);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall up the door
+		glPushMatrix();
+		glTranslatef(-1.6, 1.74, 0);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.20);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(2.31, 0, 0);
+		//calling the door
+		glPushMatrix();
+		glCallList(8);
+		glPopMatrix();
+		glPopMatrix();
+		//the wall behind the door
+		glPushMatrix();
+		glTranslatef(2.3, 0.02, 0);
+		glColor3ub(247, 232, 232);
+		glScalef(3, 2.09, 0.20);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPopMatrix();
+		// room 13 - 14 - 15 
+		glPushMatrix();
+		glTranslatef(-11.7, 0, 2);
+		glScalef(1.4, 1, 1);
+		glRotatef(180, 0, 1, 0);
+		for (int i = 0; i < 3; i++) {
+			glCallList(2);
+			glTranslatef(13.98, 0, 0);
+		}
+		glPopMatrix();
+		glTranslatef(8, 0, 0);
+		//wall of the stairs
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(61.15, 0.01, 11.6);
+		glScalef(3.75, 2.1, 0.15);
+		glutSolidCube(2);
+		glPopMatrix();
+		//calling room 17
+		glPushMatrix();
+		glTranslatef(66.5, 0, 28);
+		glScalef(1.5, 1, 1);
+		glCallList(7);
+		glPopMatrix();
+		// the kitchen walls 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(60.95, 0.01, 19.4);
+		glScalef(3.75, 2.1, 0.15);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(64.5, 0, 22);
+		glRotatef(90, 0, 1, 0);
+		glScalef(2.5, 2.1, 0.15);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(64.5, 0, 21.5);
+		glRotatef(90, 0, 1, 0);
+		glCallList(8);
+		//the wall up the door
+		glPushMatrix();
+		glTranslatef(-3.9, 1.74, 0);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.20);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPopMatrix();
+
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(64.5, 0, 27.1);
+		glRotatef(90, 0, 1, 0);
+		glScalef(0.8, 2.1, 0.15);
+		glutSolidCube(2);
+		glPopMatrix();
+		// profesors offices 
+		glPushMatrix();
+		//before the door wall  
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(80.85, -0.05, 27.83);
+		glScalef(2.7, 1, 0.04);
+		glutSolidCube(4);
+		glPopMatrix();
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door
+		glPushMatrix();
+		glTranslatef(87.1, 1.6, 27.8);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.06);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall after the door 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(93.3, -0.05, 27.83);
+		glScalef(2.65, 1, 0.04);
+		glutSolidCube(4);
+		glPopMatrix();
+		//calling the windows 
+		glPushMatrix();
+		glTranslatef(75.6, 0, 28.001);
+		for (int i = 0; i < 35; i++) {
+			glCallList(1);
+			glTranslatef(1.2, 0, 0);
+		}
+		glPopMatrix();
+		//the door and the wall up the door for the pr room 2
+		glPushMatrix();
+		glTranslatef(12.4, 0, 0);
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door
+		glPushMatrix();
+		glTranslatef(87.1, 1.6, 27.8);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.06);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall after the door 2
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(90, -0.05, 27.83);
+		glScalef(1, 1, 0.001);
+		glutSolidCube(4);
+		glPopMatrix();
+		glPopMatrix();
+		//the door and the wall up and after the door for the pr room 3
+		glPushMatrix();
+		glTranslatef(17.5, 0, 0);
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door 3
+		glPushMatrix();
+		glTranslatef(87.1, 1.6, 27.8);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.06);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall after the door 3
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(90, -0.05, 27.83);
+		glScalef(4.45, 1, 0.001);
+		glutSolidCube(4);
+		glPopMatrix();
+		glPopMatrix();
+		//the upper side 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(96, 1.9, 36.001);
+		glScalef(21, 0.28, 0.25);
+		glutSolidCube(2);
+		glPopMatrix();
+		//under the window side
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(96, -1.2, 36.001);
+		glScalef(21, 0.8, 0.25);
+		glutSolidCube(2);
+		glPopMatrix();
+		// الحيط بين غرفة الدكتور 1 و 2 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(89.5, 0, 31.8);
+		glScalef(0.02, 2.09, 4);
+		glutSolidCube(2);
+		glPopMatrix();
+		// الحيط بين غرفة الدكتور 2 - 3 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(102.5, 0, 31.8);
+		glScalef(0.02, 2.09, 4);
+		glutSolidCube(2);
+		glPopMatrix();
+		// professors table and chair 
+		glPushMatrix();
+		glTranslatef(68.5, -0.33, 32);
+		glScalef(0.27, 0.27, 0.27);
+		glCallList(21);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(125, -0.4, 25.9);
+		glRotatef(-90, 0, 1, 0);
+		glScalef(0.23, 0.23, 0.23);
+		glCallList(21);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(91, -0.33, 32);
+		glScalef(0.27, 0.27, 0.27);
+		glCallList(21);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(105, -0.33, 32);
+		glScalef(0.27, 0.27, 0.27);
+		glCallList(21);
+		glPopMatrix();
+		//////
+		glPopMatrix();
+		//room 4 - 3 - 2 
+		glPushMatrix();
+		glTranslatef(68.7, 0, -1.5);
+		glScalef(1.4, 1, 1);
+		glRotatef(180, 0, 1, 0);
+		for (int i = 0; i < 3; i++) {
+			glCallList(2);
+			glTranslatef(-14.001, 0, 0);
+		}
+		//room 1
+		glTranslatef(2, 0, 0);
+		glCallList(7);
+		glPopMatrix();
+		// حيط نهاية 
+		glPushMatrix();
+		glColor3ub(111, 222, 66);
+		glTranslatef(133.2, 0, 10);
+		glScalef(0.02, 1, 10);
+		glutSolidCube(5);
+		glPopMatrix();
+		//teachers room
+		glPushMatrix();
+		glTranslatef(123.5, 0, 28);
+		glScalef(1.2, 1, 1);
+		glCallList(2);
+		glPopMatrix();
+		// the middle space 
+
+		glPushMatrix();
+		// 1
+		//اول عضاضة 
+		glScalef(1, 1.1, 1);
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75, 0, 7);
+		glScalef(0.5, 4, 1);
+		glutSolidCube(1);
+		glPopMatrix();
+		//اول عضاضة 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75.5, 0, 6.75);
+		glScalef(1, 4, 0.5);
+		glutSolidCube(1);
+		glPopMatrix();
+		// 2
+		//اول عضاضة 
+		glPushMatrix();
+		glTranslatef(0, 0, 13.5);
+		glScalef(1, 1.1, 1);
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75, 0, 7);
+		glScalef(0.5, 4, 1);
+		glutSolidCube(1);
+		glPopMatrix();
+		//اول عضاضة 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75.5, 0, 7.25);
+		glScalef(1, 4, 0.5);
+		glutSolidCube(1);
+		glPopMatrix();
+		glPopMatrix();
+		// 3
+		//اول عضاضة 
+		glPushMatrix();
+		glTranslatef(35, 0, 13.5);
+		glScalef(1, 1.2, 1);
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75.8, 0, 7);
+		glScalef(0.5, 4, 1);
+		glutSolidCube(1);
+		glPopMatrix();
+		//اول عضاضة 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75.5, 0, 7.25);
+		glScalef(1, 4, 0.5);
+		glutSolidCube(1);
+		glPopMatrix();
+		glPopMatrix();
+		glPushMatrix();
+		// 1
+		//اول عضاضة 
+		glTranslatef(35, 0, 0);
+		glScalef(1, 1.2, 1);
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75.8, 0, 7);
+		glScalef(0.5, 4, 1);
+		glutSolidCube(1);
+		glPopMatrix();
+		//اول عضاضة 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(75.5, 0, 6.75);
+		glScalef(1, 4, 0.5);
+		glutSolidCube(1);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		// السقف 
+		glPushMatrix();
+		glColor3ub(162, 163, 164);
+		glTranslatef(0, 2.2, 0);
+		glScalef(50, 0.05, 50);
+		glutSolidCube(5);
+		glPopMatrix();
+		//
+		for (int i = 0; i < 2; i++) {
+
+			glPushMatrix();
+			glColor3ub(247, 232, 232);
+			glTranslatef(93, -1.3, 6.75);
+			glScalef(34, 1.8, 0.5);
+			glutSolidCube(1);
+			glPopMatrix();
+			glTranslatef(0, 0, 14);
+		}
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			glColor3ub(247, 232, 232);
+			glTranslatef(75, -1.3, -14.25);
+			glScalef(0.5, 1.8, 12.5);
+			glutSolidCube(1);
+			glPopMatrix();
+			glTranslatef(35.8, 0, 0);
+		}
+
+		//استدعاء الشبابيك الطرف يلي مقابيل الكريدور  
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 6; i++) {
+				glCallList(4);
+				glTranslatef(0, 0, -2.055);
+			}
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(3.55, 0.9, -8.05);
+			glScalef(0.1, 1.3, 0.1);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPopMatrix();
+			glTranslatef(35.6, 0, 0);
+		}
+		glPopMatrix();
+		// استدعاء الشبابيك الطرف يلي مقابيل القاعات 
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 17; i++) {
+				glCallList(10);
+				glTranslatef(2.055, 0, 0);
+			}
+			glPopMatrix();
+			glTranslatef(0, 0, -14.2);
+		}
+		glPopMatrix();
+		glTranslatef(-73.5, -1, -4); // تزبيط موقع الظهور 
+		/////////////////////////////////////////////////////////////// caredors walls 
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			//window glass
+			glPushMatrix();
+			glColor3ub(191, 223, 255);
+			glTranslatef(2.6, 1.05, 6.69);
+			glScalef(0.7, 2.1, 0.02);
+			glutSolidCube(2);
+			glPopMatrix();
+			//  الحديد يلي الجوانب و بالوسط
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(3.2, 1.05, 6.73);
+			glScalef(0.1, 2.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(1.9, 1.05, 6.73);
+			glScalef(0.1, 2.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, -0.96, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, 0.3, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, 2.1, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, 3.05, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPopMatrix();
+			glTranslatef(-1.3, 0, 0);
+		}
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-5.2, 0, 0);
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			//window glass
+			glPushMatrix();
+			glColor3ub(191, 223, 255);
+			glTranslatef(2.6, 1.05, 6.69);
+			glScalef(0.7, 2.1, 0.02);
+			glutSolidCube(2);
+			glPopMatrix();
+			//  الحديد يلي الجوانب و بالوسط
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(3.2, 1.05, 6.73);
+			glScalef(0.1, 2.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(1.9, 1.05, 6.73);
+			glScalef(0.1, 2.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, -0.96, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, 0.3, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, 2.1, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPushMatrix();
+			glColor3ub(162, 163, 164);
+			glTranslatef(2.5, 3.05, 6.73);
+			glScalef(0.7, 0.1, 0.06);
+			glutSolidCube(2);
+			glPopMatrix();
+			glPopMatrix();
+			glTranslatef(-1.3, 0, 0);
+		}
+		glPopMatrix();
+		glPopMatrix();
+		//(الحيط بعد المدخل ( حيط الدرج 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-4.75, 1, 9.75);
+		glScalef(0.04, 2.09, 3);
+		glutSolidCube(2);
+		glPopMatrix();
+		// باب المصلى مع الحيط يلي بعدو 
+		glPushMatrix();
+		glTranslatef(-156.15, 1, -49.8);
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door 3
+		glPushMatrix();
+		glTranslatef(87.1, 1.7, 27.88);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.12);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall after the door 2
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(85.2, 0, 28);
+		glScalef(0.5, 1.05, 0.001);
+		glutSolidCube(4);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-3.8, 0, 0);
+		glPushMatrix();
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door 3
+		glPushMatrix();
+		glTranslatef(87.1, 1.7, 27.88);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.12);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall after the door 2
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(84.6, 0, 28);
+		glScalef(0.8, 1.05, 0.001);
+		glutSolidCube(4);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-4.9, 0, 0);
+		glPushMatrix();
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door 3
+		glPushMatrix();
+		glTranslatef(87.1, 1.7, 27.88);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.12);
+		glutSolidCube(2);
+		glPopMatrix();
+		//the wall after the door 2
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(85.4, 0, 28);
+		glScalef(0.4, 1.05, 0.001);
+		glutSolidCube(4);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		// حيط اخر الكريدور 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-80, 1.01, -19.1);
+		glScalef(0.02, 2.09, 2.7);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-78.3, 1, -16.5);
+		glScalef(1.6, 2.09, 0.3);
+		glColor3ub(247, 232, 232);
+		glutSolidCube(2);
+		glPopMatrix();
+		// caredor windoows 
+		glPushMatrix();
+		glTranslatef(-76.6, 0.5, -24.4);
+		for (int i = 0; i < 6; i++) {
+			glCallList(31);
+			glTranslatef(1.38, 0, 0);
+		}
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-72.6, -0.5, -16.5);
+		glScalef(4.2, 0.6, 0.35);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-72.6, 2.7, -16.5);
+		glScalef(4.2, 0.5, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-66.7, 1, -16.5);
+		glScalef(1.7, 2.09, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-151.2, 1, -44.5);
+		//calling the door 
+		glPushMatrix();
+		glTranslatef(91, 0, 27.8);
+		glCallList(8);
+		glPopMatrix();
+		//the wall up the door 3
+		glPushMatrix();
+		glTranslatef(87.1, 1.7, 27.88);
+		glColor3ub(247, 232, 232);
+		glScalef(0.90, 0.365, 0.12);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPopMatrix();
+		glPushMatrix(); //************************************************** wall  wall wall wall wall 
+		glColor3ub(247, 232, 232);
+		glTranslatef(-39.2, 1, -16.5);
+		glScalef(24, 2.09, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-66, -0.4, -9.3);
+		glScalef(0.3, 0.7, 7.1);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glRotatef(-90, 0, 1, 0);
+		glTranslatef(-16, 0.65, 58);
+		for (int i = 0; i < 10; i++) {
+			glCallList(31);
+			glTranslatef(1.382, 0, 0);
+		}
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-66, 2.7, -9.3);
+		glScalef(0.3, 0.4, 7.1);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-61, 1, -2.35);
+		glScalef(5, 2.09, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		// ال شباك المايل بالعراب 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-62, -0.5, 5);
+		glRotatef(-60, 0, 1, 0);
+		glScalef(8.6, 0.7, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(191, 223, 255);
+		glTranslatef(-62, 1, 5);
+		glRotatef(-60, 0, 1, 0);
+		glScalef(8.6, 1.3, 0.1);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-62, 2.7, 5);
+		glRotatef(-60, 0, 1, 0);
+		glScalef(8.6, 0.4, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		// حيط كامل الغرفة 16
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-56, 1, -9.3);
+		glScalef(0.3, 2.09, 7.1);
+		glutSolidCube(2);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-29, 1, -9.3);
+		glScalef(0.3, 2.09, 7.1);
+		glutSolidCube(2);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-15.5, 1, -9.8);
+		glScalef(0.3, 2.09, 7.1);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-22.5, 1, -2.5);
+		glScalef(7, 2.09, 0.3);
+		glutSolidCube(2);
+		glPopMatrix();
+		///////////////////////////////////////// wall to edit in the end ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-15, 1, 6.5);
+		glScalef(0.3, 2.09, 6.2);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+
+		glPopMatrix();
+		// حيط 
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-10.85, 1, 12.7);
+		glScalef(6, 2.09, 0.04);
+		glutSolidCube(2);
+		glPopMatrix();
+
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-14.7, 2.5, -1);
+		glScalef(0.06, 0.6, 1.24);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-37, -0.4, 12.72);
+		glScalef(21, 0.7, 0.15);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(191, 223, 255);
+		glTranslatef(-37.5, 1.2, 12.69);
+		glScalef(21.5, 1.1, 0.02);
+		glutSolidCube(2);
+		glPopMatrix();
+		glPushMatrix();
+		glColor3ub(247, 232, 232);
+		glTranslatef(-37.5, 2.7, 12.69);
+		glScalef(21.5, 0.4, 0.15);
+		glutSolidCube(2);
+		glPopMatrix();
+
+		glLoadIdentity();
+		float po[] = { 0, 0, 1, 0 };
+		glLightfv(GL_LIGHT0, GL_POSITION, po);
+		gluLookAt(Ex, Ey, Ez, Ex + cos(th), Ey, Ez + sin(th), 0, 1, 0);
+		glTranslatef(0, 5.5, 0);
+	}
+	//glPushMatrix();
+	//glRotatef(-90, 0, 1, 0);
+	//glTranslatef(-13, -5.5, 0);
+	//glScalef(0.4, 0.3, 0.4);
+	//glCallList(14);
+	//glPopMatrix();
+
+	/////////////////////////////////////////////
+	glPushMatrix();
+	for (int i = 0; i < 4; i++) {
+		glCallList(15);
+		glTranslatef(0, 0, 14);
+	}
+	glPopMatrix();
+	////////////////////////////////////////////////////////////////
+	glPushMatrix();
+	for (int i = 0; i < 4; i++) {
+		glPushMatrix();
+		// ديسكتوب و كرسي النظري 
+		glPushMatrix();
+		glRotatef(180, 0, 1, 0);
+		glTranslatef(-5.8, -4.5, -5.2),
+			glScalef(0.15, 0.15, 0.15);
+		glPushMatrix();
+		//قاعدة الكومبيوتر
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0.9);
+		glTranslatef(32, -3, -2);
+		glScaled(10, 0.5, 8);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الجانب الايسر 
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0);
+		glTranslatef(32, -3, -8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//قاعدة الكيبورد
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0.9);
+		glTranslatef(32, -5, -2);
+		glScaled(10, 0.7, 8);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+		//الشاشة 
+		glPushMatrix();
+		glColor3f(0.1, 0.3, 0.1);
+		glRotatef(90, 0, 1, 0);
+		glTranslatef(2.5, 0.7, 30);
+		glScalef(330, 220, 2);
+		glutSolidCube(0.02);
+		glPopMatrix();
+
+		//الجانب الايمن 
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0);
+		glTranslatef(32, -3, 2);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// قاعدة الريسيرفر
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0.9);
+		glTranslatef(32, -12, -3);
+		glScaled(8, 0.5, 10);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الكيبورد
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(29, -4.7, -2.8);
+		glScaled(5, 0.2, 6);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// عنق الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30, -1.5, -2.8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 3);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		//الريسيرفر 
+		glPushMatrix();
+		glColor3f(0, 0, 1);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -8.5, -3.5);
+		glScalef(8, 6, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//عنق الفارة  
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -1.5, 0);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 3);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.9, -4.4, 0.1);
+		glRotatef(0, 1, 0, 0);
+		glScaled(0.11, 0.1, 1);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.9, -4.4, 1);
+		glRotatef(-90, 0, 1, 0);
+		glScaled(0.11, 0.1, 2);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+
+		// الفارة
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(28, -4.7, 1);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.3, 0.2, 0.2);
+		gluSphere(a, 3, 80, 80);
+		glPopMatrix();
+
+
+		// مكان cd 
+		glPushMatrix();
+		glColor3f(1, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -6.7, -3.5);
+		glScalef(8, 0.7, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//سقف
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0);
+		glTranslatef(32, 6.3, -3);
+		glScaled(12.6, 0.2, 10);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//ورا
+		glPushMatrix();
+		glColor3f(0.5, 0.7, 0);
+		glTranslatef(38, -3, -3);
+		glScalef(0.1, 19, 10);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//باب كامل 
+		glPushMatrix();
+		glColor3f(1, 0, 0);
+		glTranslatef(30.2, -3, -7);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.8, 18);
+		glutSolidCube(1);
+		glPopMatrix();
+		//باب الريسيرفر 
+		glPushMatrix();
+		glColor3f(0, 1, 1);
+		glTranslatef(25, -8, -6);
+		glRotatef(90, 1, 0, 0);
+		glScaled(10, 0.6, 7.3);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		glTranslatef(0, 1.2, 0);
+		glPushMatrix();
+		glTranslatef(0, 0, r);
+		glTranslatef(q, 0, 0);
+		// الكرسي 
+		glPushMatrix();
+		glTranslatef(25, -13, -1);
+		glRotatef(90, 0, 0, 1);
+		for (int i = 0; i < 360; i += 72)
+		{
+			glPushMatrix();
+			glRotatef(i, 1, 0, 0);
+			glCallList(17);
+			glPopMatrix();
+		}
+		glPopMatrix();
+		//عنق الكرسي
+		glPushMatrix();
+		glColor3f(0, 1, 0);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 1, 2);
+		gluCylinder(a, 0.3, 0.3, 2, 30, 30);
+		glPopMatrix();
+
+		//قاعدة الكرسي
+		glPushMatrix();
+		glColor3f(0, 0, 1);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1.5, 1.2, 1);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+
+		//عنق السنادة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.1, -7.1, -1.01);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 4, 1);
+		gluCylinder(a, 0.20, 0.20, 2, 30, 30);
+		glPopMatrix();
+
+		//السنادة
+		glPushMatrix();
+		glColor3f(0, 1, 0);
+		glTranslatef(22.7, -5.8, -1);
+		glRotatef(270, 0, 1, 0);
+		glScalef(1.2, 1.2, 0.6);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glTranslatef(0, 0, 14);
+	}
+	glPopMatrix();
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// labs 
+
+	glPushMatrix();
+	////////////////////////////
+	glPushMatrix();
+	for (int i = 0; i < 7; i++) {
+		glPushMatrix();
+		glPushMatrix();
+		glTranslatef(27.4, 0.8, 14);
+		glScalef(0.1, 0.13, 0.13);
+		glPushMatrix();
+		glPushMatrix();
+		glScalef(1, 1, 0.7);
+		glPushMatrix();
+		//قاعدة الكومبيوتر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, 0);
+		glScaled(10, 0.5, 16);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// الجانب الايمن 
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, 8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الجانب الايسر 
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, -8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//قاعدة الكيبورد
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -5, -2);
+		glScaled(10, 0.5, 12);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+		//الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(90, 0, 1, 0);
+		glTranslatef(1, 0.7, 30);
+		glScalef(330, 220, 2);
+		glutSolidCube(0.02);
+		glPopMatrix();
+
+		// كمالة الريسيرفر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -8, 4);
+		glRotatef(90, 1, 0, 0);
+		glScaled(10, 0.3, 9.5);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// قاعدة الريسيرفر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -12, 0);
+		glScaled(8, 0.5, 16);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الكيبورد
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(29, -2.5, -2);
+		glScaled(5, 0.2, 7);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// عنق الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30, -1.5, -1);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		//الريسيرفر 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -8.5, 6);
+		glScalef(8, 6, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//عنق الفارة  
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -1.5, 1.3);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -2.3, 1.3);
+		glRotatef(0, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -2.3, 2.9);
+		glRotatef(-90, 0, 1, 0);
+		glScaled(0.11, 0.1, 1.8);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		// الفارة
+		glPushMatrix();
+		glEnable(GL_CLIP_PLANE0);
+		double c[] = { 0, 1, 1, 0 };
+		glClipPlane(GL_CLIP_PLANE0, c);
+		glColor3f(0, 0, 0);
+		glTranslatef(28, -2.6, 2.9);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.3, 0.2, 0.2);
+		gluSphere(a, 3, 80, 80);
+		glPopMatrix();
+		glDisable(GL_CLIP_PLANE0);
+		glPopMatrix();
+
+		// مكان cd 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -6.7, 6);
+		glScalef(8, 0.7, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(0, 0, r);
+		glTranslatef(q, 0, 0);
+
+		// الكرسي 
+		glPushMatrix();
+		glTranslatef(25, -13, -1);
+		glRotatef(90, 0, 0, 1);
+		for (int i = 0; i < 360; i += 72)
+		{
+			glPushMatrix();
+			glRotatef(i, 1, 0, 0);
+
+			glCallList(25);
+			glPopMatrix();
+		}
+		glPopMatrix();
+		//عنق الكرسي
+		glPushMatrix();
+		glColor3ub(162, 163, 164);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 1, 2);
+		gluCylinder(a, 0.3, 0.3, 2, 30, 30);
+		glPopMatrix();
+
+		//قاعدة الكرسي
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1.5, 1.2, 1);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+
+		//عنق السنادة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.1, -7.1, -1.01);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 4, 1);
+		gluCylinder(a, 0.20, 0.20, 2, 30, 30);
+		glPopMatrix();
+
+		//السنادة
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.7, -5.8, -1);
+		glRotatef(270, 0, 1, 0);
+		glScalef(1.2, 1.2, 0.6);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glTranslatef(0, 0, -1.45);
+	}
+	glPopMatrix();
+	///////////////////////////
+	glPushMatrix();
+	for (int i = 0; i < 7; i++) {
+		glPushMatrix();
+		glRotatef(180, 0, 1, 0);
+		glTranslatef(-23.2, 0.8, -13.5);
+		glScalef(0.1, 0.13, 0.13);
+		glPushMatrix();
+		glPushMatrix();
+		glScalef(1, 1, 0.7);
+		glPushMatrix();
+		//قاعدة الكومبيوتر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, 0);
+		glScaled(10, 0.5, 16);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// الجانب الايمن 
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, 8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الجانب الايسر 
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, -8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//قاعدة الكيبورد
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -5, -2);
+		glScaled(10, 0.5, 12);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+		//الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(90, 0, 1, 0);
+		glTranslatef(1, 0.7, 30);
+		glScalef(330, 220, 2);
+		glutSolidCube(0.02);
+		glPopMatrix();
+
+		// كمالة الريسيرفر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -8, 4);
+		glRotatef(90, 1, 0, 0);
+		glScaled(10, 0.3, 9.5);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// قاعدة الريسيرفر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -12, 0);
+		glScaled(8, 0.5, 16);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الكيبورد
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(29, -2.5, -2);
+		glScaled(5, 0.2, 7);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// عنق الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30, -1.5, -1);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		//الريسيرفر 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -8.5, 6);
+		glScalef(8, 6, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//عنق الفارة  
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -1.5, 1.3);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -2.3, 1.3);
+		glRotatef(0, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -2.3, 2.9);
+		glRotatef(-90, 0, 1, 0);
+		glScaled(0.11, 0.1, 1.8);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		// الفارة
+		glPushMatrix();
+		glEnable(GL_CLIP_PLANE0);
+		double c[] = { 0, 1, 1, 0 };
+		glClipPlane(GL_CLIP_PLANE0, c);
+		glColor3f(0, 0, 0);
+		glTranslatef(28, -2.6, 2.9);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.3, 0.2, 0.2);
+		gluSphere(a, 3, 80, 80);
+		glPopMatrix();
+		glDisable(GL_CLIP_PLANE0);
+		glPopMatrix();
+
+		// مكان cd 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -6.7, 6);
+		glScalef(8, 0.7, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(0, 0, r);
+		glTranslatef(q, 0, 0);
+
+		// الكرسي 
+		glPushMatrix();
+		glTranslatef(25, -13, -1);
+		glRotatef(90, 0, 0, 1);
+		for (int i = 0; i < 360; i += 72)
+		{
+			glPushMatrix();
+			glRotatef(i, 1, 0, 0);
+
+			glCallList(25);
+			glPopMatrix();
+		}
+		glPopMatrix();
+		//عنق الكرسي
+		glPushMatrix();
+		glColor3ub(162, 163, 164);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 1, 2);
+		gluCylinder(a, 0.3, 0.3, 2, 30, 30);
+		glPopMatrix();
+
+		//قاعدة الكرسي
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1.5, 1.2, 1);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+
+		//عنق السنادة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.1, -7.1, -1.01);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 4, 1);
+		gluCylinder(a, 0.20, 0.20, 2, 30, 30);
+		glPopMatrix();
+
+		//السنادة
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.7, -5.8, -1);
+		glRotatef(270, 0, 1, 0);
+		glScalef(1.2, 1.2, 0.6);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glTranslatef(0, 0, -1.4);
+	}
+	glPopMatrix();
+	//////////////////////////
+
+	glPushMatrix();
+
+	glPushMatrix();
+	glTranslatef(26.4, 0.8, 26.3);
+	glScalef(0.1, 0.13, 0.13);
+	glPushMatrix();
+	glPushMatrix();
+	glScalef(1, 1, 0.7);
+	glPushMatrix();
+	//قاعدة الكومبيوتر
+	glPushMatrix();
+	glColor3ub(27, 37, 169);
+	glTranslatef(32, -3, 0);
+	glScaled(10, 0.5, 16);
+	glRotatef(0, 0, 1, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	// الجانب الايمن 
+	glPushMatrix();
+	glColor3ub(27, 37, 169);
+	glTranslatef(32, -3, 8);
+	glRotatef(90, 1, 0, 0);
+	glScaled(12, 0.2, 19);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//الجانب الايسر 
+	glPushMatrix();
+	glColor3ub(27, 37, 169);
+	glTranslatef(32, -3, -8);
+	glRotatef(90, 1, 0, 0);
+	glScaled(12, 0.2, 19);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//قاعدة الكيبورد
+	glPushMatrix();
+	glColor3ub(27, 37, 169);
+	glTranslatef(32, -5, -2);
+	glScaled(10, 0.5, 12);
+	glRotatef(0, 0, 1, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+	//الشاشة 
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(1, 0.7, 30);
+	glScalef(330, 220, 2);
+	glutSolidCube(0.02);
+	glPopMatrix();
+
+	// كمالة الريسيرفر
+	glPushMatrix();
+	glColor3ub(27, 37, 169);
+	glTranslatef(32, -8, 4);
+	glRotatef(90, 1, 0, 0);
+	glScaled(10, 0.3, 9.5);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	// قاعدة الريسيرفر
+	glPushMatrix();
+	glColor3ub(27, 37, 169);
+	glTranslatef(32, -12, 0);
+	glScaled(8, 0.5, 16);
+	glRotatef(0, 0, 1, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//الكيبورد
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(29, -2.5, -2);
+	glScaled(5, 0.2, 7);
+	glRotatef(0, 0, 1, 0);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	// عنق الشاشة 
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(30, -1.5, -1);
+	glRotatef(90, 1, 0, 0);
+	glScaled(0.11, 0.1, 1.6);
+	gluCylinder(a, 1, 1, 1, 90, 90);
+	glPopMatrix();
+
+	//الريسيرفر 
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glRotatef(0, 0, 1, 0);
+	glTranslatef(32, -8.5, 6);
+	glScalef(8, 6, 3);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//عنق الفارة  
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(30.2, -1.5, 1.3);
+	glRotatef(90, 1, 0, 0);
+	glScaled(0.11, 0.1, 1.6);
+	gluCylinder(a, 1, 1, 1, 90, 90);
+	glPopMatrix();
+	//
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(30.2, -2.3, 1.3);
+	glRotatef(0, 1, 0, 0);
+	glScaled(0.11, 0.1, 1.6);
+	gluCylinder(a, 1, 1, 1, 90, 90);
+	glPopMatrix();
+	//
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(30.2, -2.3, 2.9);
+	glRotatef(-90, 0, 1, 0);
+	glScaled(0.11, 0.1, 1.8);
+	gluCylinder(a, 1, 1, 1, 90, 90);
+	glPopMatrix();
+
+	// الفارة
+	glPushMatrix();
+	glEnable(GL_CLIP_PLANE0);
+	double c[] = { 0, 1, 1, 0 };
+	glClipPlane(GL_CLIP_PLANE0, c);
+	glColor3f(0, 0, 0);
+	glTranslatef(28, -2.6, 2.9);
+	glRotatef(90, 1, 0, 0);
+	glScaled(0.3, 0.2, 0.2);
+	gluSphere(a, 3, 80, 80);
+	glPopMatrix();
+	glDisable(GL_CLIP_PLANE0);
+	glPopMatrix();
+
+	// مكان cd 
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glRotatef(0, 0, 1, 0);
+	glTranslatef(32, -6.7, 6);
+	glScalef(8, 0.7, 3);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(0, 0, r);
+	glTranslatef(q, 0, 0);
+
+	// الكرسي 
+	glPushMatrix();
+	glTranslatef(25, -13, -1);
+	glRotatef(90, 0, 0, 1);
+	for (int i = 0; i < 360; i += 72)
+	{
+		glPushMatrix();
+		glRotatef(i, 1, 0, 0);
+
+		glCallList(25);
+		glPopMatrix();
+	}
+	glPopMatrix();
+	//عنق الكرسي
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(25, -9, -1);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1, 1, 2);
+	gluCylinder(a, 0.3, 0.3, 2, 30, 30);
+	glPopMatrix();
+
+	//قاعدة الكرسي
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(25, -9, -1);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1.5, 1.2, 1);
+	glutSolidTorus(1, 1, 50, 50);
+	glPopMatrix();
+
+	//عنق السنادة 
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(22.1, -7.1, -1.01);
+	glRotatef(90, 1, 0, 0);
+	glScalef(1, 4, 1);
+	gluCylinder(a, 0.20, 0.20, 2, 30, 30);
+	glPopMatrix();
+
+	//السنادة
+	glPushMatrix();
+	glColor3f(0, 0, 0);
+	glTranslatef(22.7, -5.8, -1);
+	glRotatef(270, 0, 1, 0);
+	glScalef(1.2, 1.2, 0.6);
+	glutSolidTorus(1, 1, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	/////////////////////////////
+	glPushMatrix();
+	for (int i = 0; i < 6; i++) {
+		glPushMatrix();
+		glRotatef(90, 0, 1, 0);
+		glTranslatef(-17.2, 0.8, 22);
+		glScalef(0.1, 0.13, 0.13);
+		glPushMatrix();
+		glPushMatrix();
+		glScalef(1, 1, 0.7);
+		glPushMatrix();
+		//قاعدة الكومبيوتر
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(32, -3, 0);
+		glScaled(10, 0.5, 16);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// الجانب الايمن 
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, 8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الجانب الايسر 
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -3, -8);
+		glRotatef(90, 1, 0, 0);
+		glScaled(12, 0.2, 19);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//قاعدة الكيبورد
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -5, -2);
+		glScaled(10, 0.5, 12);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+		//الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(90, 0, 1, 0);
+		glTranslatef(1, 0.7, 30);
+		glScalef(330, 220, 2);
+		glutSolidCube(0.02);
+		glPopMatrix();
+
+		// كمالة الريسيرفر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -8, 4);
+		glRotatef(90, 1, 0, 0);
+		glScaled(10, 0.3, 9.5);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// قاعدة الريسيرفر
+		glPushMatrix();
+		glColor3ub(27, 37, 169);
+		glTranslatef(32, -12, 0);
+		glScaled(8, 0.5, 16);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//الكيبورد
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(29, -2.5, -2);
+		glScaled(5, 0.2, 7);
+		glRotatef(0, 0, 1, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		// عنق الشاشة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30, -1.5, -1);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		//الريسيرفر 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -8.5, 6);
+		glScalef(8, 6, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		//عنق الفارة  
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -1.5, 1.3);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -2.3, 1.3);
+		glRotatef(0, 1, 0, 0);
+		glScaled(0.11, 0.1, 1.6);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+		//
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(30.2, -2.3, 2.9);
+		glRotatef(-90, 0, 1, 0);
+		glScaled(0.11, 0.1, 1.8);
+		gluCylinder(a, 1, 1, 1, 90, 90);
+		glPopMatrix();
+
+		// الفارة
+		glPushMatrix();
+		glEnable(GL_CLIP_PLANE0);
+		double c[] = { 0, 1, 1, 0 };
+		glClipPlane(GL_CLIP_PLANE0, c);
+		glColor3f(0, 0, 0);
+		glTranslatef(28, -2.6, 2.9);
+		glRotatef(90, 1, 0, 0);
+		glScaled(0.3, 0.2, 0.2);
+		gluSphere(a, 3, 80, 80);
+		glPopMatrix();
+		glDisable(GL_CLIP_PLANE0);
+		glPopMatrix();
+
+		// مكان cd 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glRotatef(0, 0, 1, 0);
+		glTranslatef(32, -6.7, 6);
+		glScalef(8, 0.7, 3);
+		glutSolidCube(1);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(0, 0, r);
+		glTranslatef(q, 0, 0);
+
+		// الكرسي 
+		glPushMatrix();
+		glRotatef(b, 0, 1, 0);                                 /////// ****************************************************************
+		glTranslatef(0, 0, 0);
+		glPushMatrix();
+		glTranslatef(25, -13, -1);
+		glRotatef(90, 0, 0, 1);
+		for (int i = 0; i < 360; i += 72)
+		{
+			glPushMatrix();
+			glRotatef(i, 1, 0, 0);
+			glColor3ub(0, 0, 0);
+			glCallList(25);
+			glPopMatrix();
+		}
+		glPopMatrix();
+		//عنق الكرسي
+		glPushMatrix();
+		glColor3f(162, 163, 164);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 1, 2);
+		gluCylinder(a, 0.3, 0.3, 2, 30, 30);
+		glPopMatrix();
+
+		//قاعدة الكرسي
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(25, -9, -1);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1.5, 1.2, 1);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+
+		//عنق السنادة 
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.1, -7.1, -1.01);
+		glRotatef(90, 1, 0, 0);
+		glScalef(1, 4, 1);
+		gluCylinder(a, 0.20, 0.20, 2, 30, 30);
+		glPopMatrix();
+
+		//السنادة
+		glPushMatrix();
+		glColor3f(0, 0, 0);
+		glTranslatef(22.7, -5.8, -1);
+		glRotatef(270, 0, 1, 0);
+		glScalef(1.2, 1.2, 0.6);
+		glutSolidTorus(1, 1, 50, 50);
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glPopMatrix();
+		glTranslatef(1.4, 0, 0);
+	}
+	glPopMatrix();
+
+	///////////////////////////////////////////
+	glPopMatrix();
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////write here
+
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 8; i++) {
+			//     2
+			glPushMatrix();
+			glTranslatef(22, -5, -2.1);
+			glRotatef(90, 0, 1, 0);
+			glScaled(0.7, 0.7, 0.7);
+			glPushMatrix();
+			glPushMatrix();
+			glCallList(40);
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslatef(0, 0, -1.5);
+			glCallList(40);
+			glPopMatrix();
+
+			glPushMatrix();
+			glCallList(41);
+			glPopMatrix();
+
+			glPushMatrix();
+			if (::g == true && h == 0) {
+				for (int i = 1; i <= 90; i++) {
+					glRotatef(1, 1, 0, 0);
+				}
+
+			}
+			if (::g == false && h == 90) {
+				for (int i = 1; i <= 90; i++) {
+					glRotatef(-1, 1, 0, 0);
+				}
+			}
+			//اليد 
+			glPushMatrix();
+			glColor3ub(242, 194, 98);
+			glTranslatef(22.2, 0.11, -0.9);
+			glRotatef(90, 0, 1, 0);
+			glScalef(1.8, 0.05, 0.9);
+			glutSolidCube(1);
+			glPopMatrix();
+			//
+			glPushMatrix();
+			glColor3ub(242, 194, 98);
+			glTranslatef(23, 0.11, -0.15);
+			glRotatef(90, 0, 1, 0);
+			glScalef(0.3, 0.05, 0.7);
+			glutSolidCube(1);
+			glPopMatrix();
+			glPopMatrix();
+
+			//
+			glPushMatrix();
+			glTranslatef(22.62, -1.5, -1.55);
+			glColor3f(0, 0, 0);
+			glScalef(9, 1.5, 1.4);
+			gluQuadricDrawStyle(a, GLU_LINE);
+			gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+			glPopMatrix();
+			glPopMatrix();
+			glPopMatrix();
+			glTranslatef(0, 0, 1.8);
+		}
+		glPopMatrix();
+		glTranslatef(6, 0, 0);
+	}
+	glPopMatrix();
+	//
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 8; i++) {
+			//     2
+			glPushMatrix();
+			glTranslatef(24, -5, -4.2);
+			glRotatef(90, 0, 1, 0);
+			glScaled(0.6, 0.7, 0.7);
+			glPushMatrix();
+			glPushMatrix();
+			glCallList(40);
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslatef(0, 0, -1.5);
+			glCallList(40);
+			glPopMatrix();
+
+			glPushMatrix();
+			glCallList(41);
+			glPopMatrix();
+
+			glPushMatrix();
+			if (::g == true && h == 0) {
+				for (int i = 1; i <= 90; i++) {
+					glRotatef(1, 1, 0, 0);
+				}
+
+			}
+			if (::g == false && h == 90) {
+				for (int i = 1; i <= 90; i++) {
+					glRotatef(-1, 1, 0, 0);
+				}
+			}
+			//اليد 
+			glPushMatrix();
+			glColor3ub(242, 194, 98);
+			glTranslatef(22.2, 0.11, -0.9);
+			glRotatef(90, 0, 1, 0);
+			glScalef(1.8, 0.05, 0.9);
+			glutSolidCube(1);
+			glPopMatrix();
+			//
+			glPushMatrix();
+			glColor3ub(242, 194, 98);
+			glTranslatef(23, 0.11, -0.15);
+			glRotatef(90, 0, 1, 0);
+			glScalef(0.3, 0.05, 0.7);
+			glutSolidCube(1);
+			glPopMatrix();
+			glPopMatrix();
+
+			//
+			glPushMatrix();
+			glTranslatef(22.62, -1.5, -1.55);
+			glColor3f(0, 0, 0);
+			glScalef(9, 1.5, 1.4);
+			gluQuadricDrawStyle(a, GLU_LINE);
+			gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+			glPopMatrix();
+			glPopMatrix();
+			glPopMatrix();
+			glTranslatef(1.5, 0, 1.8);
+		}
+		glPopMatrix();
+		glTranslatef(1.5, 0, 0);
+	}
+	glPopMatrix();
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// arab tables and chairs 
+	glEnable(GL_LIGHT0);
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 3; i++) {
+			glPushMatrix();
+			glTranslatef(0, -4.8, -43);
+			glScalef(12, 12, 12);
+			glCallList(28);
+			glPopMatrix();
+			glTranslatef(-4.3, 0, 0);
+		}
+		glPopMatrix();
+		glTranslatef(0, 0, 7);
+	}
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(-15, -4.8, -50);
+	glScalef(12, 12, 12);
+	glCallList(28);
+	glPopMatrix();
+	glPushMatrix();
+	for (int i = 0; i < 6; i++) {
+		glPushMatrix();
+		glTranslatef(-17.5, -4.8, -45);
+		glScalef(12, 12, 12);
+		glCallList(28);
+		glPopMatrix();
+		glTranslatef(0, 0, 7);
+	}
+	glPopMatrix();
+	glPushMatrix();
+	for (int i = 0; i < 5; i++) {
+		glPushMatrix();
+		glTranslatef(-22.8, -4.8, -38);
+		glScalef(12, 12, 12);
+		glCallList(28);
+		glPopMatrix();
+		glTranslatef(0, 0, 7);
+	}
+	glPopMatrix();
+	glDisable(GL_LIGHT0);
+	glPushMatrix();
+	for (int i = 0; i < 5; i++) {
+		glPushMatrix();
+		glTranslatef(2, -0.5, 0);
+		glScalef(1, 0.9, 1);
+		glPushMatrix();
+		for (int i = 0; i < 3; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 3; i++) {
+				glPushMatrix();
+				glTranslatef(3, -5.7, 2);
+				glRotatef(90, 0, 1, 0);
+				glScalef(6, 6, 6);
+				glCallList(29);
+				glPopMatrix();
+				glTranslatef(-0.75, 0, 0);
+			}
+			glPopMatrix();
+			glTranslatef(0, 1.45, 0);
+		}
+		glPopMatrix();
+		glPopMatrix();
+		glTranslatef(2.3, 0, 0);
+	}
+	glPopMatrix();
+	//,15,16 القاعة 14
+	glPushMatrix();
+	for (int i = 0; i < 3; i++) {
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 8; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(22, -5, -2.1);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.7, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(6, 0, 0);
+		}
+		glPopMatrix();
+		//
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 8; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(24, -5, -4.2);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.6, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(1.5, 0, 0);
+		}
+		glPopMatrix();
+		glTranslatef(0, 0, -19.5);
+	}
+	glPopMatrix();
+	//القاعة 11
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 5; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(22, -5, -2.1);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.7, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(8, 0, 0);
+		}
+		glPopMatrix();
+		//
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 5; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(24, -5, -3.8);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.6, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -3);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glColor3f(0, 0, 0);
+				glTranslatef(22.62, -1.5, -1.55);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(2, 0, 0);
+		}
+		glPopMatrix();
+
+		glPopMatrix();
+		glTranslatef(-7, 0, 32.1);
+	}
+	glPopMatrix();
+	//القاعة 9
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 5; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(22, -5, -2.1);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.7, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(8, 0, 0);
+		}
+		glPopMatrix();
+		//
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 5; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(24, -5, -3.8);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.6, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -3);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(2, 0, 0);
+		}
+		glPopMatrix();
+
+		glPopMatrix();
+		glTranslatef(-7, 0, 46.5);
+	}
+	glPopMatrix();
+	//القاعة 7
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 6; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(22, -5, -2.1);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.7, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(8, 0, 0);
+		}
+		glPopMatrix();
+		//
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 5; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(24, -5, -3.8);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.6, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -3);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(2, 0, 0);
+		}
+		glPopMatrix();
+
+		glPopMatrix();
+		glTranslatef(-7, 0, 60.5);
+	}
+	glPopMatrix();
+	// القاعة 5
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 6; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(22, -5, -2.1);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.7, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(8, 0, 0);
+		}
+		glPopMatrix();
+		//
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 5; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(24, -5, -3.8);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.6, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -3);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(2, 0, 0);
+		}
+		glPopMatrix();
+
+		glPopMatrix();
+		glTranslatef(-7, 0, 74.5);
+	}
+	glPopMatrix();
+	// القاعة 4
+	glPushMatrix();
+	for (int i = 0; i < 2; i++) {
+		glPushMatrix();
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 8; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(22, -5, -2.1);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.7, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -1.5);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3f(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(5.5, 0, 0);
+		}
+		glPopMatrix();
+		//
+		glPushMatrix();
+		for (int i = 0; i < 2; i++) {
+			glPushMatrix();
+			for (int i = 0; i < 8; i++) {
+				//     2
+				glPushMatrix();
+				glTranslatef(24, -5, -3.8);
+				glRotatef(90, 0, 1, 0);
+				glScaled(0.6, 0.7, 0.7);
+				glPushMatrix();
+				glPushMatrix();
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0, 0, -3);
+				glCallList(40);
+				glPopMatrix();
+
+				glPushMatrix();
+				glCallList(41);
+				glPopMatrix();
+
+				glPushMatrix();
+				if (::g == true && h == 0) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(1, 1, 0, 0);
+					}
+
+				}
+				if (::g == false && h == 90) {
+					for (int i = 1; i <= 90; i++) {
+						glRotatef(-1, 1, 0, 0);
+					}
+				}
+				//اليد 
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(22.2, 0.11, -0.9);
+				glRotatef(90, 0, 1, 0);
+				glScalef(1.8, 0.05, 0.9);
+				glutSolidCube(1);
+				glPopMatrix();
+				//
+				glPushMatrix();
+				glColor3ub(242, 194, 98);
+				glTranslatef(23, 0.11, -0.15);
+				glRotatef(90, 0, 1, 0);
+				glScalef(0.3, 0.05, 0.7);
+				glutSolidCube(1);
+				glPopMatrix();
+				glPopMatrix();
+
+				//
+				glPushMatrix();
+				glTranslatef(22.62, -1.5, -1.55);
+				glColor3ub(0, 0, 0);
+				glScalef(9, 1.5, 1.4);
+				gluQuadricDrawStyle(a, GLU_LINE);
+				gluCylinder(a, 0.1, 0.1, 1, 6, 3);
+				glPopMatrix();
+				glPopMatrix();
+				glPopMatrix();
+				glTranslatef(0, 0, 1.8);
+			}
+			glPopMatrix();
+			glTranslatef(2, 0, 0);
+		}
+		glPopMatrix();
+
+		glPopMatrix();
+		glTranslatef(4, 0, 89);
+	}
+	glPopMatrix();
+
+	//////////////////////////////////////////
+	glPushMatrix();
+	glTranslatef(12, 13.5, 82);
+	glRotatef(90, 0, 1, 0);
+	glScalef(3, 3.3, 3);
+	glPushMatrix();
+
+	//الدرج
+	glPushMatrix();
+	glTranslatef(2.7, 0, 0.09);
+
+	for (int i = 0; i < 10; i++) {
+		glTranslatef(0.08, 0.06, 0);
+		glColor3ub(162, 163, 164);
+		glCallList(50);
+	}
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2.5, -5.7, 0.36);
+	glRotatef(90, -1, 1, 0);
+	glColor3f(0.5, 0.5, 0.5);
+	gluCylinder(a, 0.01, 0.01, 0.8, 70, 70);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2.5, -5.7, -0.2);
+	glRotatef(90, -1, 1, 0);
+	glColor3f(0.5, 0.5, 0.5);
+	gluCylinder(a, 0.01, 0.01, 0.8, 70, 70);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(3.9, -5.38, 0.41);
+	glScalef(0.33, 0.06, 1.4);
+	glColor3f(0.3, 0.5, 0.4);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(6.3, 0.57, 0.88);
+	glRotatef(180, 0, 1, 0);
+	glPushMatrix();
+	glTranslatef(2.7, 0, 0.09);
+	for (int i = 0; i < 10; i++) {
+		glTranslatef(0.08, 0.06, 0);
+		glColor3ub(162, 163, 164);
+		glCallList(50);
+
+	}
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2.5, -5.7, 0.36);
+	glRotatef(90, -1, 1, 0);
+	glColor3f(0.5, 0.5, 0.5);
+	gluCylinder(a, 0.01, 0.01, 0.8, 70, 70);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2.5, -5.7, -0.2);
+	glRotatef(90, -1, 1, 0);
+	glColor3f(0.5, 0.5, 0.5);
+	gluCylinder(a, 0.01, 0.01, 0.8, 70, 70);
+	glPopMatrix();
+
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+	// arab door 
+	glPushMatrix();
+	glRotatef(90, 0, 1, 0);
+	glTranslatef(14, 0, -10.2);
+	glPushMatrix();
+	//arab door right ////////////////////// move 
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(-8.61, -4.76, 9.88);
+	glScalef(0.02, 1.6, 0.62);
+	glutSolidCube(2);
+	glPopMatrix();
+	//arab door left ////////////////////// move 
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(-8.61, -4.76, 8.64);
+	glScalef(0.02, 1.6, 0.62);
+	glutSolidCube(2);
+	glPopMatrix();
+	// upper side 
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(-8.61, -2.75, 9.25);
+	glScalef(0.02, 0.4, 1.24);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(-8.61, -2.75, 9.27);
+	glScalef(0.04, 0.4, 0.1);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(-8.61, -3.2, 9.27);
+	glScalef(0.04, 0.1, 1.24);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+
+	glPopMatrix();
+	//main door 
+	glPushMatrix();
+	//main door right ////////////////////// move 
+	glPushMatrix();
+	if (::t == true && e == 0) {
+		glTranslatef(1.75, 0, 19);
+		for (int i = 1; i <= 90; i++) {
+			glRotatef(-1, 0, 1, 0);
+		}
+	}
+	if (::t == false && e == 90) {
+		for (int i = 1; i <= 90; i++) {
+			glRotatef(0.05, 0, 1, 0);
+		}
+	}
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(-8.61, -4.76, 9.88);
+	glScalef(0.02, 1.6, 0.62);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	//main door left ////////////////////// move 
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(-8.61, -4.76, 8.64);
+	glScalef(0.02, 1.6, 0.62);
+	glutSolidCube(2);
+	glPopMatrix();
+	// upper side 
+	glPushMatrix();
+	glColor3ub(191, 223, 255);
+	glTranslatef(-8.61, -2.75, 9.25);
+	glScalef(0.02, 0.4, 1.24);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(-8.61, -2.75, 9.27);
+	glScalef(0.04, 0.4, 0.1);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPushMatrix();
+	glColor3ub(162, 163, 164);
+	glTranslatef(-8.61, -3.2, 9.27);
+	glScalef(0.04, 0.1, 1.24);
+	glutSolidCube(2);
+	glPopMatrix();
+	glPopMatrix();
+	//////
+	glPushMatrix();
+	glTranslatef(2, -5.2, -31);
+	glRotatef(-90, 0, 1, 0);
+	glScalef(10, 10, 10);
+	glPushMatrix();
+	glTranslatef(0.9, 0, 0);
+	glColor3f(0.1, 0.5, 0.7);
+	glScalef(0.9, 1, 4);
+	glutSolidCube(0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.87, 0.1, 0);
+	glColor3f(0.1, 0.7, 0.4);
+	glScalef(0.09, 1, 4);
+	glutSolidCube(0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glTranslatef(0.9, 0.15, 0);
+	glColor3f(0.3, 0.5, 0.9);
+	glScalef(0.068, 0.006, 0.42);
+	glutSolidCube(1);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+
+	glFlush();
+}
+
+void Timer(int)
+{
+	glutTimerFunc(16, Timer, 0);
+	glutPostRedisplay();
+}
+void ani(int)
+{
+	glutPostRedisplay();
+	glutTimerFunc(15, ani, 0);
+}
+
+int main(int argc, char** argv)
+{
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_SINGLE); // Use single display buffer.
+	glutInitWindowSize(640, 640);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("EMPTY WINDOW");
+	InitGL();
+	glutReshapeFunc(ReSizeGLScene);
+	glutDisplayFunc(DrawGLScene);
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(Special);
+	glutMouseFunc(Mouse);
+	glutTimerFunc(0, Timer, 0);
+	ani(0);
+	glutMainLoop();
+	return 0;
+}
